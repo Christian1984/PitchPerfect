@@ -10,10 +10,6 @@ import UIKit
 import AVFoundation
 
 class PlaySoundsViewController: UIViewController {
-    @IBOutlet weak var speedSlider: UISlider!
-    @IBOutlet weak var pitchSlider: UISlider!
-    
-    var audioPlayer: AVAudioPlayer!
     var recordedAudio: RecordedAudio?
     
     var audioRatePitch: AVAudioUnitTimePitch!
@@ -21,18 +17,30 @@ class PlaySoundsViewController: UIViewController {
     var audioPlayerNode: AVAudioPlayerNode!
     var audioFile: AVAudioFile!
     
+    @IBOutlet weak var borderView: UIImageView!
+    @IBOutlet weak var snailButton: UIImageView!
+    @IBOutlet weak var rabbitButton: UIImageView!
+    @IBOutlet weak var chipmunkButton: UIImageView!
+    @IBOutlet weak var vaderButton: UIImageView!
+    @IBOutlet weak var touchPosition: UIImageView!
+    
+    let MIN_RATE: Float = 0.5
+    let MAX_RATE: Float = 2.0
+    let MIN_PITCH: Float = -1000
+    let MAX_PITCH: Float = 1000
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //setup border for touch area
+        borderView.layer.borderColor = UIColor(red: 33/255, green: 73/255, blue: 111/255, alpha: 1.0).CGColor
+        borderView.layer.borderWidth = 2.0
         
         if recordedAudio != nil
         {
             println("!!!good!!!")
             
             let audioUrl = recordedAudio!.getFilePathUrl()
-            audioPlayer = AVAudioPlayer(contentsOfURL: audioUrl, error: nil)
-            audioPlayer.enableRate = true
-            
-            println("INFO: Resource found at -> \(audioUrl); duration: \(audioPlayer.duration)")
             
             //create audio engine and attach pitch-effect and player
             audioEngine = AVAudioEngine()
@@ -62,77 +70,81 @@ class PlaySoundsViewController: UIViewController {
     
     
     //actions
-    @IBAction func slowPlay(sender: UIButton) {
-        speedSlider.value = 0.5
-        playAudioWithSliderSettings()
-    }
-
-    @IBAction func fastPlay(sender: UIButton) {
-        speedSlider.value = 2.0
-        playAudioWithSliderSettings()
-    }
-    
-    @IBAction func highPitchPlay(sender: UIButton) {
-        pitchSlider.value = 800
-        playAudioWithSliderSettings()
-    }
-    
-    @IBAction func lowPitchPlay(sender: UIButton) {
-        pitchSlider.value = -1000
-        playAudioWithSliderSettings()
-    }
-    
     @IBAction func stopPlay(sender: UIButton) {
-        audioPlayer.stop()
-        audioPlayer.currentTime = 0
-        
         audioPlayerNode.stop()
     }
     
     @IBAction func playAudio(sender: AnyObject) {
-        playAudioWithSliderSettings()
+        playAudio()
     }
     
-    @IBAction func setSpeed(sender: UISlider) {
-        println("Speed \(sender.value)")
-        audioRatePitch.rate = sender.value
+    @IBAction func viewTapped(sender: UITapGestureRecognizer) {
+        println("Tapping: \(sender.locationInView(self.view))")
+        updateOnUserInput(sender.locationInView(self.view))
     }
     
-    @IBAction func setPitch(sender: UISlider) {
-        println("Pitch \(sender.value)")
-        audioRatePitch.pitch = sender.value
+    @IBAction func viewDragged(sender: UIPanGestureRecognizer) {
+        if sender.state == .Changed
+        {
+            println("Dragging: \(sender.locationInView(self.view))")
+            updateOnUserInput(sender.locationInView(self.view))
+        }
     }
-    
     
     //custom functions
-    func playAudioWithSliderSettings() {
-        playAudioAtRateAndPitch(speedSlider.value, pitch: pitchSlider.value)
+    func updateOnUserInput(position: CGPoint) {
+        var x = position.x
+        var y = position.y
+        if (coordinateInsideButtonRect(x, y: y)) {
+            touchPosition.center.x = x
+            touchPosition.center.y = y
+            
+            let pitch = getPitchValueFromTouchLocation(Float(x))
+            let rate = getRateValueFromTouchLocation(Float(y))
+            
+            println("Pitch: \(pitch)")
+            println("Rate: \(rate)")
+            
+            audioRatePitch.pitch = pitch
+            audioRatePitch.rate = rate
+        }
     }
     
-    func playAudioAtRateAndPitch(rate: Float, pitch: Float) {
-        audioRatePitch.pitch = pitch
-        audioRatePitch.rate = rate
+    func coordinateInsideButtonRect(x: CGFloat, y: CGFloat) -> Bool {
+        if ((x < borderView.center.x - borderView.frame.size.width / 2) || (y < borderView.center.y - borderView.frame.size.height / 2) || (x > borderView.center.x + borderView.frame.size.width / 2) || (y > borderView.center.y + borderView.frame.size.height / 2)) {
+            return false
+        }
         
+        return true
+    }
+    
+    func getPitchValueFromTouchLocation(x: Float) -> Float {
+        let MIN_PITCH: Float = -1000
+        let MAX_PITCH: Float = 1000
+        
+        let X_MIN = Float(borderView.center.x - borderView.frame.size.width / 2)
+        let X_MAX = Float(borderView.center.x + borderView.frame.size.width / 2)
+        
+        return remapToInterval(MIN_PITCH, targetHigh: MAX_PITCH, srcLow: X_MIN, srcHigh: X_MAX, srcValue: x)
+    }
+    
+    func getRateValueFromTouchLocation(y: Float) -> Float {
+        let MIN_RATE: Float = 0.5
+        let MAX_RATE: Float = 2.0
+        
+        let Y_MIN = Float(borderView.center.y - borderView.frame.size.height / 2)
+        let Y_MAX = Float(borderView.center.y + borderView.frame.size.height / 2)
+        
+        return remapToInterval(MIN_RATE, targetHigh: MAX_RATE, srcLow: Y_MIN, srcHigh: Y_MAX, srcValue: y)
+    }
+    
+    func remapToInterval(targetLow: Float, targetHigh: Float, srcLow: Float, srcHigh: Float, srcValue: Float) -> Float {
+        return (targetLow - targetHigh) * (srcValue - srcHigh) / (srcLow - srcHigh) + targetHigh
+    }
+    
+    func playAudio() {
         audioPlayerNode.stop()
         audioPlayerNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
         audioPlayerNode.play()
     }
-    
-    func playAudioAtSpeed(speed: Float) {
-        audioPlayer.stop()
-        audioPlayer.rate = speed
-        
-        audioPlayer.play()
-    }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

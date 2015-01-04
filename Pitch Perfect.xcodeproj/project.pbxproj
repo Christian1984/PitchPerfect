@@ -15,7 +15,6 @@
 		8383F9B71A495DD600A391EF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8383F9B51A495DD600A391EF /* LaunchScreen.xib */; };
 		8383F9C31A495DD600A391EF /* Pitch_PerfectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8383F9C21A495DD600A391EF /* Pitch_PerfectTests.swift */; };
 		8383F9CD1A5149A200A391EF /* PlaySoundsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8383F9CC1A5149A200A391EF /* PlaySoundsViewController.swift */; };
-		8383F9CF1A52971700A391EF /* helloWorld.wav in Resources */ = {isa = PBXBuildFile; fileRef = 8383F9CE1A52971700A391EF /* helloWorld.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +40,6 @@
 		8383F9C11A495DD600A391EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8383F9C21A495DD600A391EF /* Pitch_PerfectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pitch_PerfectTests.swift; sourceTree = "<group>"; };
 		8383F9CC1A5149A200A391EF /* PlaySoundsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaySoundsViewController.swift; sourceTree = "<group>"; };
-		8383F9CE1A52971700A391EF /* helloWorld.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = helloWorld.wav; path = ../../../../Downloads/helloWorld.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,7 +96,6 @@
 		8383F9AA1A495DD600A391EF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				8383F9CE1A52971700A391EF /* helloWorld.wav */,
 				8383F9AB1A495DD600A391EF /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -204,7 +201,6 @@
 				8383F9B21A495DD600A391EF /* Main.storyboard in Resources */,
 				8383F9B71A495DD600A391EF /* LaunchScreen.xib in Resources */,
 				8383F9B41A495DD600A391EF /* Images.xcassets in Resources */,
-				8383F9CF1A52971700A391EF /* helloWorld.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
