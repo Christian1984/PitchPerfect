@@ -10,6 +10,8 @@ import UIKit
 import AVFoundation
 
 class PlaySoundsViewController: UIViewController {
+    @IBOutlet weak var speedSlider: UISlider!
+    @IBOutlet weak var pitchSlider: UISlider!
     
     var audioPlayer: AVAudioPlayer!
     var recordedAudio: RecordedAudio?
@@ -19,27 +21,8 @@ class PlaySoundsViewController: UIViewController {
     var audioPlayerNode: AVAudioPlayerNode!
     var audioFile: AVAudioFile!
     
-    //let HelloWorldSound = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("helloWorld", ofType: "wav")!)
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-        //if let HelloWorldSound = NSBundle.mainBundle().pathForResource("helloWorld", ofType: "wav")
-//        {
-//            //println("HelloWorldSound: \(HelloWorldSound)")
-//            
-//            if let hwsUrl = NSURL(fileURLWithPath: HelloWorldSound)
-//            {
-//                var error:NSError?
-//                audioPlayer = AVAudioPlayer(contentsOfURL: hwsUrl, error: &error)
-//                audioPlayer.enableRate = true
-//            }
-//        }
-//        else
-//        {
-//            println("WARNING: Resource not found!")
-//        }
         
         if recordedAudio != nil
         {
@@ -77,22 +60,53 @@ class PlaySoundsViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    
+    //actions
     @IBAction func slowPlay(sender: UIButton) {
-        //playAudioAtSpeed(0.5)
-        playAudioAtRateAndPitch(0.5, pitch: 1.0)
+        speedSlider.value = 0.5
+        playAudioWithSliderSettings()
     }
 
     @IBAction func fastPlay(sender: UIButton) {
-        //playAudioAtSpeed(2.0)
-        playAudioAtRateAndPitch(2.0, pitch: 1.0)
+        speedSlider.value = 2.0
+        playAudioWithSliderSettings()
     }
     
     @IBAction func highPitchPlay(sender: UIButton) {
-        playAudioAtRateAndPitch(1.5, pitch: 800)
+        pitchSlider.value = 800
+        playAudioWithSliderSettings()
     }
     
     @IBAction func lowPitchPlay(sender: UIButton) {
-        playAudioAtRateAndPitch(1.0, pitch: -1000)
+        pitchSlider.value = -1000
+        playAudioWithSliderSettings()
+    }
+    
+    @IBAction func stopPlay(sender: UIButton) {
+        audioPlayer.stop()
+        audioPlayer.currentTime = 0
+        
+        audioPlayerNode.stop()
+    }
+    
+    @IBAction func playAudio(sender: AnyObject) {
+        playAudioWithSliderSettings()
+    }
+    
+    @IBAction func setSpeed(sender: UISlider) {
+        println("Speed \(sender.value)")
+        audioRatePitch.rate = sender.value
+    }
+    
+    @IBAction func setPitch(sender: UISlider) {
+        println("Pitch \(sender.value)")
+        audioRatePitch.pitch = sender.value
+    }
+    
+    
+    //custom functions
+    func playAudioWithSliderSettings() {
+        playAudioAtRateAndPitch(speedSlider.value, pitch: pitchSlider.value)
     }
     
     func playAudioAtRateAndPitch(rate: Float, pitch: Float) {
@@ -109,13 +123,6 @@ class PlaySoundsViewController: UIViewController {
         audioPlayer.rate = speed
         
         audioPlayer.play()
-    }
-    
-    @IBAction func stopPlay(sender: UIButton) {
-        audioPlayer.stop()
-        audioPlayer.currentTime = 0
-        
-        audioPlayerNode.stop()
     }
     
     /*
